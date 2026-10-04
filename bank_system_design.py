@@ -1,3 +1,31 @@
+'''
+PART 1
+Design a Bank System
+
+CORE OPERATIONS:
+    open_account(account_id, str) -> bool
+    deposit(account_id: str, amount: int) -> bool:
+    withdraw(account_id: str, amount: int) -> bool:
+    transaction(from_acc: str, to_acc: str, amount: int) -> bool:
+
+PART 2:
+    schedule(from, to, amount, delay) 
+    -Schedule a transaction
+
+    tick(number) -> updates internal clock by number
+    - things need to run that are active between tick and prev clock 16:18
+
+PART 3:
+    history
+    1. deposit
+    2. Withdrawl
+    3. transaction_deposit
+    4. transaction_withdrawl
+    getHistory(account, number) -> gets the last number of items added to history
+
+'''
+
+
 import heapq
 from collections import defaultdict
 
