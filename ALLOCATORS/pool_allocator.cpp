@@ -1,55 +1,113 @@
 #include <cstddef>
 #include <iostream>
+#include <new>
+#include <utility>
 #include <vector>
-
-struct Block {
-	std::byte* buffer;
-	Block* next;
-};
 
 class MemoryPool {
 	public:
-		explicit MemoryPool(std::size_t size, int preAlloc, int maxAlloc) :
-			m_blockSize(size),
-			m_maxAlloc(maxAlloc)
-			{}
+		explicit MemoryPool(std::size_t size, int preAlloc, int maxAlloc)
+		{
+			m_blockSize = std::max(size, sizeof(FreeNode));
+			m_capacity = maxAlloc;
+			m_blocks.reserve(maxAlloc);
 
-		~MemoryPool() {
-			
+			for (size_t i {}; i < preAlloc && i < maxAlloc; ++i) {
+				pushFree(newBlock());
+			}
 		}
 
-		int allocated() const {
-			return m_allocated.size();
+		~MemoryPool() {
+			for (auto block : m_blocks) {
+				::operator delete(block);
+			}
+		}
+
+		int inUse() const {
+			return m_used;
 		}
 
 		int availible() const {
-			return m_maxAlloc - m_allocated.size();
+			return m_capacity - m_used;
 		}
 
 		std::size_t blockSize() const {
 			return m_blockSize;
 		}
 
-		void* get() {
-			return nullptr;
+		void* allocate() {
+			if (freeList == nullptr) {
+				if (m_blocks.size() >= m_capacity) {
+					throw std::bad_alloc();
+				}	
+				pushFree(newBlock());
+			}
+
+			FreeNode* node = freeList;
+			freeList = freeList->next;
+			++m_used;
+			return node;
 		}
 
-		void release(void* ptr) {
+		void deallocate(void* ptr) {
+			if (ptr == nullptr) {
+				return;
+			}
 
+			pushFree(ptr);
+			--m_used;
 		}
 
+		template<typename T, typename... Args>
+		T* make(Args... args) {
+			if (sizeof(T) > m_blockSize) {
+				throw std::bad_alloc();
+			}	
+
+			return new (allocate()) T(std::forward<Args>(args)...);
+		}
+
+		//No Copy 
+		MemoryPool(const MemoryPool&) = delete;
+		MemoryPool& operator=(const MemoryPool&) = delete;
 
 	private:
-		std::vector<void*> m_allocated;
+		struct FreeNode {
+			FreeNode* next;
+		};
+		
+		void* newBlock() {
+			void* block = ::operator new(m_blockSize);
+			m_blocks.push_back(block);
+			return block;
+		}
+
+		void pushFree(void* block) {
+			freeList = new (block) FreeNode{freeList};
+		}
+
+
+		FreeNode* freeList{};
+		std::vector<void*> m_blocks{};
+
 		std::size_t m_blockSize;
-		int m_maxAlloc {};
+		std::size_t m_capacity;
+		std::size_t m_used {};
 
 };
 
 int main() {
-	MemoryPool pool(64, 4, 10);
+	MemoryPool pool(sizeof(int), 4, 10);
 
-	std::cout << pool.allocated() << "\n";
+	int* a = pool.make<int>(12);
+	int* b = pool.make<int>(10);
+
+	std::cout << *a << "\n";
+	std::cout << pool.inUse() << "\n";
+
+	pool.deallocate(a);
+
+	std::cout << pool.inUse() << "\n";
 
 	return 0;
 }
