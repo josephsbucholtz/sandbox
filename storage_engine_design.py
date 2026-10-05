@@ -82,6 +82,8 @@ class StorageService:
                 
 
                 case "COMMIT":
+                    self.transactionFlag = False
+
                     for key, value in self.copy.items():
                         self.map[key] = value
 
@@ -90,7 +92,6 @@ class StorageService:
 
                     output += copyOut
 
-                    self.transactionFlag = False
 
                 case "ROLLBACK":
                     self.copy.clear()
@@ -105,5 +106,6 @@ class StorageService:
 
 engine = StorageService()
 
-print(engine.run_commands(["SET name james", "GET name", "BEGIN", "SET name john", "SET person james", "GET person", "COMMIT"]))
+print(engine.run_commands(["SET name james", "GET name", "BEGIN", "SET name john", "DELETE name", 
+                           "DELETE mark", "SET person james", "GET person", "COMMIT"]))
 
