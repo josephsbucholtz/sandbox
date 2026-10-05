@@ -45,7 +45,7 @@ class EventManager:
         minimumID = float('inf')
         priority = self.heap[0][0]
         for i in range(len(self.heap)):
-            if priority != self.heap[i][0]:
+            if self.heap[i][0] != priority:
                 break
 
             minimumID = min(minimumID, self.heap[i][1])
