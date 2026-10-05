@@ -1,5 +1,6 @@
 
 '''
+PART 1
 You are given an initial list of events, where each event has  a unique
 eventId and priority.
 
@@ -19,15 +20,41 @@ Additional:
     - For every call to updatePriority, eventId refers to an active event
 '''
 
+import heapq
 
 class EventManager:
     def __init__(self, initEvents):
-        pass
+        self.heap = []
+
+        for i in range(len(initEvents)):
+            id, prior = initEvents[i]
+            heapq.heappush_max(self.heap ,(prior, id))
     
-    def updatePriority(self, eventId: int, newPriority: int):
-        pass
+    def updatePriority(self, eventId: int, newPriority: int) -> None:
+        for i in range(len(self.heap)):
+            if self.heap[i][1] == eventId:
+                self.heap[i][0] = newPriority
+                heapq.heapify_max(self.heap)
+                break
+                    
 
-    def int pollHighest(self):
-        pass
+    def pollHighest(self) -> int:
+        if not self.heap:
+            return -1
+
+        minimumID = float('inf')
+        priority = self.heap[0][0]
+        for i in range(len(self.heap)):
+            if priority != self.heap[i][0]:
+                break
+
+            minimumID = min(minimumID, self.heap[i][1])
+        
+        self.heap.remove((priority, minimumID))
+        return minimumID
 
 
+manager = EventManager([[1, 1], [2, 2], [3, 3], [4, 4], [5, 4], [6, 4]])
+manager.pollHighest()
+
+print(manager.heap)
