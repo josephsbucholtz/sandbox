@@ -26,6 +26,13 @@ class Arena {
 			return ptr;
 		}
 
+
+		template<typename T>
+		T* make(T type) {
+			void* ptr { this->allocate(sizeof(T), alignof(T)) };
+			return static_cast<T*>(ptr);
+		}
+
 		void reset() noexcept {
 			m_offset = 0;
 		}
@@ -59,8 +66,40 @@ class Arena {
 		std::size_t m_capacity{};
 };
 
+struct Person {
+	std::string name {};
+	int age {};
+
+	Person() = default;
+	Person(std::string name, int age) {
+		this->name = name;
+		this->age = age;
+	}
+};
+
+
 int main() { 
 	Arena arena(1024);
+
+	double* a = arena.make(double());
+	int* b = arena.make(int());
+	Person* john = arena.make(Person());
+	john->name = "John";
+	john->age = 53;
+
+	std::cout << john->name << "\n";
+	std::cout << john->age << "\n";
+
+	*a = 4.1;
+	*b = 1;
+
+
+	std::cout << *a << "\n";
+	std::cout << *b << "\n";
+
+	std::cout << arena.capacity() << "\n";
+	std::cout << arena.used() << "\n";
+	std::cout << arena.remaining() << "\n";
 
 
 	return 0; 

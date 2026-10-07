@@ -36,15 +36,15 @@ class MemoryPool {
 		}
 
 		void* allocate() {
-			if (freeList == nullptr) {
+			if (m_freeList == nullptr) {
 				if (m_blocks.size() >= m_capacity) {
 					throw std::bad_alloc();
 				}	
 				pushFree(newBlock());
 			}
 
-			FreeNode* node = freeList;
-			freeList = freeList->next;
+			FreeNode* node = m_freeList;
+			m_freeList = m_freeList->next;
 			++m_used;
 			return node;
 		}
@@ -83,11 +83,11 @@ class MemoryPool {
 		}
 
 		void pushFree(void* block) {
-			freeList = new (block) FreeNode{freeList};
+			m_freeList = new (block) FreeNode{m_freeList};
 		}
 
 
-		FreeNode* freeList{};
+		FreeNode* m_freeList{};
 		std::vector<void*> m_blocks{};
 
 		std::size_t m_blockSize;
