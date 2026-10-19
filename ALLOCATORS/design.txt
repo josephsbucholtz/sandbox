@@ -1,0 +1,62 @@
+
+
+REGION BASED-MEMORY MANAGEMENT
+
+What is it?
+
+A type of memory management where the allocated object
+is a region of raw memory given to the user. 
+
+|---------------------------------|--------------------------------------- |
+|                                 |                                        |
+|          REGION                 |			Total Mem                      |
+|							      |	                                       |
+|---------------------------------|--------------------------------------- |
+
+
+TYPES:
+- bump / linear allocator
+- pool allocator
+
+PROS:
+1. Reduce overhead
+2. Bulk pre-allocation / deallocation
+3. Allocation Speed
+
+Bump Allocator:
+- pointer to region of memory
+- Allocation, bump pointer by size of object 
+
+Pool Allocator:
+- Fixed sized block chunks
+- Free List (Linked List)
+
+
+USE CASE:
+
+PROBLEM:
+store a large array of pointers to some memory
+
+int* v = new int(4) //High number of times | BAD
+
+
+INSTEAD:
+create a region of memory (to size and type)
+
+allocate from said region (LOW OVERHEAD, NO MUTLI new or malloc)
+
+
+int* v = area.allocate(memory) // High numbers is ok
+
+
+TRADE OFFs / CONS:
+- No dynamic region resizing
+- Internal Alignment Issues
+- Free All or free nothing
+
+
+
+WHEN SHOULD I USE:
+Use when you know the size of memory, 
+can reduce overhead from new,
+and similar types.

@@ -22,24 +22,21 @@ begin -> begins a transaction
 commit -> commits all commands run in transaction. MUST SUCEEED
 rollback -> if fail then rollback all changes
 
-
-PART 3
-
 '''
 
 from collections import defaultdict
 
 class StorageService:
     def __init__(self):
-        self.map = defaultdict()
+        self.map = {}
         self.copy = defaultdict()
         self.deleteStore = list()
         self.transactionFlag = False
 
     def get(self, key: str) -> str:
         if self.transactionFlag:
-            return self.copy[key] if self.copy[key] else self.map[key]
-        return self.map[key] 
+            return self.copy[key] if self.copy.get(key) else self.map.get(key)
+        return self.map.get(key)
 
     def set(self, key: str, value: str) -> None:
         if self.transactionFlag:
@@ -91,6 +88,7 @@ class StorageService:
                         self.delete(key)
 
                     output += copyOut
+                    copyOut.clear()
 
 
                 case "ROLLBACK":
@@ -106,6 +104,6 @@ class StorageService:
 
 engine = StorageService()
 
-print(engine.run_commands(["SET name james", "GET name", "BEGIN", "SET name john", "DELETE name", 
+print(engine.run_commands(["SET name james", "GET name", "BEGIN", "GET sarah", "SET name john", "DELETE name", 
                            "DELETE mark", "SET person james", "GET person", "COMMIT"]))
 

@@ -1,6 +1,5 @@
 
 '''
-PART 1
 You are given an initial list of events, where each event has  a unique
 eventId and priority.
 
@@ -18,6 +17,13 @@ Additional:
     - If event not removed by pollHighest then active.
     - All values of eventId unique
     - For every call to updatePriority, eventId refers to an active event
+
+EXAMPLE:
+events = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 4], [6, 4]]
+
+pollHighest() -> removes [4, 4]
+updatePriority(5, 1) -> updates eventID 5 to priorty 1
+
 '''
 
 import heapq
@@ -42,7 +48,7 @@ class EventManager:
         if not self.heap:
             return -1
 
-        minimumID = float('inf')
+        minimumID = float('inf') #MAX INT
         priority = self.heap[0][0]
         for i in range(len(self.heap)):
             if self.heap[i][0] != priority:
